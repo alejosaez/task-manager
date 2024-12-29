@@ -1,32 +1,32 @@
 'use client';
 
-import { Task } from "@/types/task";
-import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { Task } from '@/types/task';
+import { useRouter } from 'next/navigation';
+import { useGetTaskByIdQuery } from '@/store/slices/taskApi';
+import { useEffect, useState } from 'react';
 
 const TaskDetail = ({ params }: { params: Promise<{ id: string }> }) => {
   const router = useRouter();
-  const [id, setId] = useState<string | null>(null);
-  const [task, setTask] = useState<Task | null>(null);
-  const [isCompleted, setIsCompleted] = useState<boolean>(false);
-  const [title, setTitle] = useState<string>("");
+  const [taskId, setTaskId] = useState<string | null>(null);
+  const [title, setTitle] = useState<Task['title']>('');
+  const [isCompleted, setIsCompleted] = useState<Task['completed']>(false);
 
   useEffect(() => {
     params.then((resolvedParams) => {
-      setId(resolvedParams.id);
-      // Mock task data, replace with an API call to fetch the task by ID
-      const fetchedTask: Task = {
-        _id: resolvedParams.id,
-        title: "Task 1",
-        description: "This is the description for task 1",
-        completed: false,
-        createdAt: new Date().toISOString(),
-      };
-      setTask(fetchedTask);
-      setTitle(fetchedTask.title || "");
-      setIsCompleted(fetchedTask.completed);
+      setTaskId(resolvedParams.id);
     });
   }, [params]);
+
+  const { data: task, isLoading, error } = useGetTaskByIdQuery(taskId!, {
+    skip: !taskId,
+  });
+
+  useEffect(() => {
+    if (task) {
+      setTitle(task.title || '');
+      setIsCompleted(task.completed);
+    }
+  }, [task]);
 
   const handleTitleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setTitle(e.target.value);
@@ -36,10 +36,26 @@ const TaskDetail = ({ params }: { params: Promise<{ id: string }> }) => {
     setIsCompleted(e.target.checked);
   };
 
-  if (!task) {
+  if (isLoading || !taskId) {
     return (
       <div className="flex items-center justify-center h-screen">
         Loading...
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="flex items-center justify-center h-screen">
+        Error loading task details. Please try again later.
+      </div>
+    );
+  }
+
+  if (!task) {
+    return (
+      <div className="flex items-center justify-center h-screen">
+        Task not found.
       </div>
     );
   }
@@ -50,7 +66,7 @@ const TaskDetail = ({ params }: { params: Promise<{ id: string }> }) => {
         onClick={() => router.push(`/tasks`)}
         className="flex items-center text-[#8892b3] mb-6"
       >
-        {"< Volver al listado de tareas"}
+        {'< Volver al listado de tareas'}
       </button>
 
       <div className="w-full bg-white rounded-lg">
@@ -84,8 +100,7 @@ const TaskDetail = ({ params }: { params: Promise<{ id: string }> }) => {
               <h3 className="mb-3 block font-medium text-black">Description</h3>
               <textarea
                 rows={6}
-                placeholder="Task Description"
-                defaultValue={task.description || "Sin descripción"}
+                defaultValue={task.description || 'Sin descripción'}
                 className="w-full rounded-lg border-[1.5px] border-primary bg-transparent px-5 py-3 font-normal text-black outline-none transition focus:border-[#c2c2ff] active:border-[#c2c2ff]"
               />
             </div>
@@ -98,7 +113,7 @@ const TaskDetail = ({ params }: { params: Promise<{ id: string }> }) => {
                 Cancel
               </button>
               <button
-                onClick={() => router.push(`/tasks/${id}/edit`)}
+                onClick={() => router.push(`/tasks/${taskId}/edit`)}
                 className="px-4 py-2 w-full sm:w-auto min-w-28 text-sm font-bold text-white bg-[#c2c2ff] rounded hover:bg-[#a6a6ff]"
               >
                 Save
