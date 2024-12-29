@@ -39,21 +39,21 @@ export default function TasksPage() {
   };
 
   const handleAddTaskClick = () => {
-    setShowModal(true); // Mostrar el formulario al hacer clic en "Add Task"
+    setShowModal(true);
   };
 
   return (
     <div className="flex h-screen bg-[#fdfdfd]">
       <div className="flex-1 sm:p-6 p-2">
-        <header className="flex items-center justify-between mb-8">
-          <h1 className="text-2xl font-bold">Task Board</h1>
+        <div className="flex items-center justify-between mb-8">
+          <h1 className="text-2xl font-bol text-gray-400">Task Board </h1>
           <button
             onClick={handleAddTaskClick}
             className="flex items-center gap-2 px-4 py-2 text-sm font-bold text-blue-500 bg-blue-100 rounded-full shadow-sm transition hover:bg-blue-200"
           >
             + Add Task
           </button>
-        </header>
+        </div>
 
         <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
           <div className="bg-[#f0f4ff] p-4 rounded-lg shadow">

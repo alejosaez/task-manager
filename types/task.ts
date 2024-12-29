@@ -5,3 +5,8 @@ export interface Task {
     completed: boolean;
     createdAt: string;
   }
+
+  export type FormData = {
+    title: string;
+    description?: string;
+  };
