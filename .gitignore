@@ -1,0 +1,30 @@
+# Node.js
+node_modules/
+.env
+dist/
+coverage/
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Directorios del sistema operativo
+.DS_Store
+Thumbs.db
+
+# Archivos específicos de editores
+.idea/
+.vscode/
+*.swp
+
+# Archivos de compilación y dependencia
+*.lock
+package-lock.json
+yarn.lock
+
+# Otros
+*.tmp
+*.bak
