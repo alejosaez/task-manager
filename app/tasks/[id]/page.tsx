@@ -1,15 +1,24 @@
 'use client';
 
-import { Task } from '@/types/task';
+import { useForm, SubmitHandler } from 'react-hook-form';
 import { useRouter } from 'next/navigation';
-import { useGetTaskByIdQuery } from '@/store/slices/taskApi';
+import { useGetTaskByIdQuery, useUpdateTaskMutation } from '@/store/slices/taskApi';
 import { useEffect, useState } from 'react';
+
+type UpdateTaskFormData = {
+  title: string;
+  description?: string;
+  completed: boolean;
+};
 
 const TaskDetail = ({ params }: { params: Promise<{ id: string }> }) => {
   const router = useRouter();
   const [taskId, setTaskId] = useState<string | null>(null);
-  const [title, setTitle] = useState<Task['title']>('');
-  const [isCompleted, setIsCompleted] = useState<Task['completed']>(false);
+
+  const { register, handleSubmit, setValue, formState: { errors } } = useForm<UpdateTaskFormData>();
+  const [updateTask, { isLoading: isUpdating }] = useUpdateTaskMutation();
+
+  const { data: task, isLoading, error } = useGetTaskByIdQuery(taskId!, { skip: !taskId });
 
   useEffect(() => {
     params.then((resolvedParams) => {
@@ -17,23 +26,28 @@ const TaskDetail = ({ params }: { params: Promise<{ id: string }> }) => {
     });
   }, [params]);
 
-  const { data: task, isLoading, error } = useGetTaskByIdQuery(taskId!, {
-    skip: !taskId,
-  });
-
   useEffect(() => {
     if (task) {
-      setTitle(task.title || '');
-      setIsCompleted(task.completed);
+      setValue('title', task.title);
+      setValue('description', task.description || '');
+      setValue('completed', task.completed);
     }
-  }, [task]);
+  }, [task, setValue]);
 
-  const handleTitleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setTitle(e.target.value);
-  };
+  const onSubmit: SubmitHandler<UpdateTaskFormData> = async (data) => {
+    if (!taskId) return;
 
-  const handleCheckboxChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setIsCompleted(e.target.checked);
+    if (!data.title.trim()) {
+      alert('The title is required.');
+      return;
+    }
+
+    try {
+      await updateTask({ id: taskId, ...data }).unwrap();
+      router.push('/tasks');
+    } catch (err) {
+      console.error('Failed to update task:', err);
+    }
   };
 
   if (isLoading || !taskId) {
@@ -52,14 +66,6 @@ const TaskDetail = ({ params }: { params: Promise<{ id: string }> }) => {
     );
   }
 
-  if (!task) {
-    return (
-      <div className="flex items-center justify-center h-screen">
-        Task not found.
-      </div>
-    );
-  }
-
   return (
     <div className="w-full p-6 bg-[#fdfdfd]">
       <button
@@ -69,7 +75,7 @@ const TaskDetail = ({ params }: { params: Promise<{ id: string }> }) => {
         {'< Volver al listado de tareas'}
       </button>
 
-      <div className="w-full bg-white rounded-lg">
+      <form onSubmit={handleSubmit(onSubmit)} className="w-full bg-white rounded-lg p-6">
         <div className="flex justify-between">
           <h3 className="mb-3 block font-medium text-black">Title</h3>
 
@@ -77,9 +83,7 @@ const TaskDetail = ({ params }: { params: Promise<{ id: string }> }) => {
             <label className="flex items-center text-sm font-medium text-black">
               <input
                 type="checkbox"
-                id="completed"
-                checked={isCompleted}
-                onChange={handleCheckboxChange}
+                {...register('completed')}
                 className="mr-2 h-5 w-5 rounded-full border-2 border-[#c2c2ff] checked:bg-[#c2c2ff] focus:outline-none transition-colors"
               />
               <span>Mark as Completed</span>
@@ -88,40 +92,36 @@ const TaskDetail = ({ params }: { params: Promise<{ id: string }> }) => {
         </div>
 
         <input
-          type="text"
-          value={title}
-          onChange={handleTitleChange}
-          className="w-full rounded-lg border-[1.5px] border-primary bg-transparent px-5 py-3 font-normal text-black outline-none transition focus:border-[#c2c2ff] active:border-[#c2c2ff] mb-6"
+          {...register('title', { required: 'Title is required' })}
+          className={`w-full rounded-lg text-gray-500 border-[1.5px] px-5 py-3 mb-4 ${errors.title ? 'border-red-500' : 'border-[#c2c2ff]'} focus:outline-none`}
+          placeholder="Task title"
+        />
+        {errors.title && <p className="text-red-500 text-xs mb-2">{errors.title.message}</p>}
+
+        <h3 className="mb-3 block font-medium text-black">Description</h3>
+        <textarea
+          {...register('description')}
+          className="w-full rounded-lg text-gray-500 border-[1.5px] border-[#c2c2ff] px-5 py-3 mb-4 focus:outline-none"
+          rows={6}
+          placeholder="Task description"
         />
 
-        <div className="rounded-sm bg-white shadow-default">
-          <div className="flex flex-col">
-            <div>
-              <h3 className="mb-3 block font-medium text-black">Description</h3>
-              <textarea
-                rows={6}
-                defaultValue={task.description || 'Sin descripción'}
-                className="w-full rounded-lg border-[1.5px] border-primary bg-transparent px-5 py-3 font-normal text-black outline-none transition focus:border-[#c2c2ff] active:border-[#c2c2ff]"
-              />
-            </div>
-
-            <div className="flex justify-end mt-6 space-x-4">
-              <button
-                onClick={() => router.push(`/tasks`)}
-                className="px-4 py-2 w-full sm:w-auto min-w-28 text-sm font-bold text-white bg-gray-500 rounded hover:bg-gray-600"
-              >
-                Cancel
-              </button>
-              <button
-                onClick={() => router.push(`/tasks/${taskId}/edit`)}
-                className="px-4 py-2 w-full sm:w-auto min-w-28 text-sm font-bold text-white bg-[#c2c2ff] rounded hover:bg-[#a6a6ff]"
-              >
-                Save
-              </button>
-            </div>
-          </div>
+        <div className="flex justify-end space-x-4 mt-4">
+          <button
+            type="button"
+            onClick={() => router.push(`/tasks`)}
+            className="px-4 py-2 text-sm font-bold text-white bg-gray-500 rounded hover:bg-gray-600"
+          >
+            Cancel
+          </button>
+          <button
+            type="submit"
+            className="px-4 py-2 text-sm font-bold text-white bg-[#c2c2ff] rounded hover:bg-[#a6a6ff]"
+          >
+            {isUpdating ? 'Saving...' : 'Save'}
+          </button>
         </div>
-      </div>
+      </form>
     </div>
   );
 };

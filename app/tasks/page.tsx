@@ -1,17 +1,17 @@
-"use client";
+'use client';
 
-import React, { useState } from "react";
-import { useGetTasksQuery } from "@/store/slices/taskApi";
-import Card from "../components/task/Task";
-import { useRouter } from "next/navigation";
-import TaskForm from "../components/task/TaskForm";
+import React, { useState } from 'react';
+import { useGetTasksQuery } from '@/store/slices/taskApi';
+import Card from '../components/task/Task';
+import { useRouter } from 'next/navigation';
+import TaskForm from '../components/task/TaskForm';
 
 export default function TasksPage() {
   const router = useRouter();
   const [showModal, setShowModal] = useState(false);
 
   const { data: tasks, isLoading, error } = useGetTasksQuery();
-  console.log("data: ", tasks);
+
   const handleCardClick = (id: string) => {
     router.push(`/tasks/${id}`);
   };
@@ -27,7 +27,7 @@ export default function TasksPage() {
     <div className="flex h-screen bg-[#fdfdfd]">
       <div className="flex-1 sm:p-6 p-2">
         <div className="flex items-center justify-between mb-8">
-          <h1 className="text-2xl font-bol text-gray-400">Task Board</h1>
+          <h1 className="text-2xl font-bold text-gray-400">Task Board</h1>
           <button
             onClick={handleAddTaskClick}
             className="flex items-center gap-2 px-4 py-2 text-sm font-bold text-blue-500 bg-blue-100 rounded-full shadow-sm transition hover:bg-blue-200"
@@ -51,7 +51,7 @@ export default function TasksPage() {
                     <Card
                       _id={task._id}
                       title={task.title}
-                      description={task.description || ""}
+                      description={task.description || ''}
                       completed={task.completed}
                       createdAt={task.createdAt}
                     />
@@ -74,7 +74,7 @@ export default function TasksPage() {
                     <Card
                       _id={task._id}
                       title={task.title}
-                      description={task.description || ""}
+                      description={task.description || ''}
                       completed={task.completed}
                       createdAt={task.createdAt}
                     />
