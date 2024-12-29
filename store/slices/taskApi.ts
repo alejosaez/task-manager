@@ -22,7 +22,15 @@ export const taskApi = createApi({
       }),
       invalidatesTags: (result, error, { id }) => [{ type: 'Task', id }, { type: 'Task' }],
     }),
+    createTask: builder.mutation<Task, { title: string; description?: string }>({
+      query: (body) => ({
+        url: '/tasks',
+        method: 'POST',
+        body,
+      }),
+      invalidatesTags: ['Task'],
+    }),
   }),
 });
 
-export const { useGetTasksQuery, useGetTaskByIdQuery, useUpdateTaskMutation } = taskApi;
+export const { useGetTasksQuery, useGetTaskByIdQuery, useUpdateTaskMutation, useCreateTaskMutation } = taskApi;
