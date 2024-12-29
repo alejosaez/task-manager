@@ -16,7 +16,7 @@ const TaskDetail = ({ params }: { params: Promise<{ id: string }> }) => {
       setId(resolvedParams.id);
       // Mock task data, replace with an API call to fetch the task by ID
       const fetchedTask: Task = {
-        id: resolvedParams.id,
+        _id: resolvedParams.id,
         title: "Task 1",
         description: "This is the description for task 1",
         completed: false,
