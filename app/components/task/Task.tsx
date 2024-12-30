@@ -6,6 +6,7 @@ import React, { useState } from "react";
 import { useRouter } from "next/navigation";
 import { FaTrash, FaSpinner } from "react-icons/fa";
 import ConfirmationPopup from "../ConfirmationPopup";
+import { toast } from "react-toastify";
 
 const Card: React.FC<Task> = ({
   _id,
@@ -34,7 +35,13 @@ const Card: React.FC<Task> = ({
     setShowPopup(false);
     try {
       await deleteTask(_id).unwrap();
+      toast.success("Task deleted successfully!", {
+        className: "bg-red-100 text-red-800 font-semibold rounded-lg",
+      });
     } catch (err) {
+      toast.error("Failed to delete task!", {
+        className: "bg-red-100 text-red-800 font-semibold rounded-lg",
+      });
       console.error("Failed to delete task:", err);
     }
   };
@@ -46,8 +53,8 @@ const Card: React.FC<Task> = ({
 
   return (
     <div
-      className={`relative rounded-xl border-2 border-gray-100 bg-white overflow-hidden ${
-        isLoading ? "opacity-50 pointer-events-none" : ""
+      className={`relative rounded-xl ${
+        isLoading ? "bg-gray-200 pointer-events-none" : "bg-white cursor-pointer"
       }`}
       onClick={handleCardClick}
     >
@@ -64,23 +71,18 @@ const Card: React.FC<Task> = ({
           )}
         </button>
       </div>
-
-      <div className="flex flex-col p-6 pt-10">
-        <h3 className="font-medium text-gray-500 sm:text-lg truncate">
-          {title}
-        </h3>
+      <div className="flex flex-col p-6">
+        <h3 className="font-medium text-gray-500 sm:text-lg truncate">{title}</h3>
         <p className="text-sm text-gray-700 truncate">{description}</p>
         <p className="text-xs text-gray-500 mt-2">
           Created at: {new Date(createdAt).toLocaleDateString("es-AR")}
         </p>
       </div>
-
       {completed && (
         <div className="absolute bottom-0 right-0 bg-green-600 text-white text-[10px] font-medium px-3 py-1.5 rounded-l-xl">
           Completed!
         </div>
       )}
-
       {showPopup && (
         <ConfirmationPopup
           title="Confirm Deletion"

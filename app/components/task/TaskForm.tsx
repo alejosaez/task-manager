@@ -5,6 +5,8 @@ import { useForm, SubmitHandler } from 'react-hook-form';
 import { useRouter } from 'next/navigation';
 import { useCreateTaskMutation } from '@/store/slices/taskApi';
 import { FormData } from '@/types/task';
+import { toast } from 'react-toastify'; // Importa toast
+import 'react-toastify/dist/ReactToastify.css'; // Asegúrate de incluir los estilos
 
 const TaskForm = ({
   setShowModal,
@@ -22,6 +24,7 @@ const TaskForm = ({
   const onSubmit: SubmitHandler<FormData> = async (data) => {
     try {
       await createTask(data).unwrap();
+      toast.success('Task created successfully!');
       setShowModal(false);
       router.push(`/tasks`);
     } catch (err) {

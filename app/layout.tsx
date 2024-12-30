@@ -2,6 +2,8 @@ import type { Metadata } from 'next';
 import './globals.css';
 import SideBar from './components/Sidebar';
 import ReduxProvider from '@/store/Provider';
+import { ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 export const metadata: Metadata = {
   title: 'Task Manager',
@@ -21,7 +23,20 @@ export default function RootLayout({
             <div className="w-auto">
               <SideBar />
             </div>
-            <div className="flex-1 p-6 overflow-y-auto">{children}</div>
+            <div className="flex-1 p-6 overflow-y-auto">
+              {children}
+              <ToastContainer 
+                position="bottom-right" 
+                autoClose={3000} 
+                hideProgressBar={true} 
+                newestOnTop={false} 
+                closeOnClick 
+                rtl={false} 
+                pauseOnFocusLoss 
+                draggable 
+                pauseOnHover 
+              />
+            </div>
           </div>
         </ReduxProvider>
       </body>
