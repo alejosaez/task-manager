@@ -10,3 +10,9 @@ export interface Task {
     title: string;
     description?: string;
   };
+
+  export type UpdateTaskFormData = {
+    title: string;
+    description?: string;
+    completed: boolean;
+  };

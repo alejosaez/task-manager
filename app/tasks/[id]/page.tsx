@@ -8,16 +8,14 @@ import {
   useDeleteTaskMutation,
 } from "@/store/slices/taskApi";
 import { useEffect, useState } from "react";
-
-type UpdateTaskFormData = {
-  title: string;
-  description?: string;
-  completed: boolean;
-};
+import ConfirmationPopup from "@/app/components/ConfirmationPopup";
+import { FaSpinner } from "react-icons/fa";
+import { UpdateTaskFormData } from "@/types/task";
 
 const TaskDetail = ({ params }: { params: Promise<{ id: string }> }) => {
   const router = useRouter();
   const [taskId, setTaskId] = useState<string | null>(null);
+  const [showPopup, setShowPopup] = useState(false);
 
   const {
     register,
@@ -28,11 +26,7 @@ const TaskDetail = ({ params }: { params: Promise<{ id: string }> }) => {
   const [updateTask, { isLoading: isUpdating }] = useUpdateTaskMutation();
   const [deleteTask, { isLoading: isDeleting }] = useDeleteTaskMutation();
 
-  const {
-    data: task,
-    isLoading,
-    error,
-  } = useGetTaskByIdQuery(taskId!, { skip: !taskId });
+  const { data: task, isLoading, error } = useGetTaskByIdQuery(taskId!, { skip: !taskId });
 
   useEffect(() => {
     params.then((resolvedParams) => {
@@ -64,19 +58,28 @@ const TaskDetail = ({ params }: { params: Promise<{ id: string }> }) => {
     }
   };
 
-  const handleDelete = async () => {
+  const handleDeleteClick = (e: React.MouseEvent<HTMLButtonElement>) => {
+    e.stopPropagation();
+    setShowPopup(true);
+  };
+
+  const handleConfirmDelete = async (e: React.MouseEvent<HTMLButtonElement>) => {
+    e.stopPropagation();
     if (!taskId) return;
 
-    if (confirm(`Are you sure you want to delete the task "${task?.title}"?`)) {
-      try {
-        await deleteTask(taskId).unwrap();
-        alert("Task deleted successfully");
-        router.push("/tasks");
-      } catch (err) {
-        console.error("Failed to delete task:", err);
-        alert("Error deleting the task. Please try again.");
-      }
+    try {
+      await deleteTask(taskId).unwrap();
+      setShowPopup(false);
+      router.push("/tasks");
+    } catch (err) {
+      console.error("Failed to delete task:", err);
+      alert("Error deleting the task. Please try again.");
     }
+  };
+
+  const handleCancel = (e: React.MouseEvent<HTMLButtonElement>) => {
+    e.stopPropagation();
+    setShowPopup(false);
   };
 
   if (isLoading || !taskId) {
@@ -101,18 +104,17 @@ const TaskDetail = ({ params }: { params: Promise<{ id: string }> }) => {
         onClick={() => router.push(`/tasks`)}
         className="flex items-center text-[#8892b3] mb-6"
       >
-        {"< Volver al listado de tareas"}
+        {"< Back to Task List"}
       </button>
 
       <div className="relative w-full bg-white rounded-lg p-6">
-        {/* Botón de eliminar */}
         <button
-          onClick={handleDelete}
+          onClick={handleDeleteClick}
           className="absolute top-4 right-4 px-4 py-2 text-sm font-bold text-white bg-red-500 rounded hover:bg-red-600"
-          disabled={isDeleting}
         >
-          {isDeleting ? "Deleting..." : "Delete"}
+          {isDeleting ? <FaSpinner className="animate-spin" /> : "Delete"}
         </button>
+
         <div className="pt-16">
           <form onSubmit={handleSubmit(onSubmit)}>
             <div className="flex justify-between">
@@ -163,12 +165,24 @@ const TaskDetail = ({ params }: { params: Promise<{ id: string }> }) => {
                 type="submit"
                 className="px-4 py-2 text-sm font-bold text-white bg-[#c2c2ff] rounded hover:bg-[#a6a6ff]"
               >
-                {isUpdating ? "Saving..." : "Save"}
+                {isUpdating ? <FaSpinner className="animate-spin" /> : "Save"}
               </button>
             </div>
           </form>
         </div>
       </div>
+
+      {showPopup && (
+        <ConfirmationPopup
+          title="Confirm Deletion"
+          message={`Are you sure you want to delete the task "${task?.title}"?`}
+          isOpen={showPopup}
+          onConfirm={handleConfirmDelete}
+          onCancel={handleCancel}
+          isLoading={isDeleting}
+          onClick={(e) => e.stopPropagation()}
+        />
+      )}
     </div>
   );
 };

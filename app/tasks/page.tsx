@@ -3,19 +3,13 @@
 import React, { useState } from "react";
 import { useGetTasksQuery } from "@/store/slices/taskApi";
 import Card from "../components/task/Task";
-import { useRouter } from "next/navigation";
 import TaskForm from "../components/task/TaskForm";
 
 export default function TasksPage() {
-  const router = useRouter();
   const [showModal, setShowModal] = useState(false);
   const [filter, setFilter] = useState("all");
 
   const { data: tasks, isLoading, error } = useGetTasksQuery();
-
-  const handleCardClick = (id: string) => {
-    router.push(`/tasks/${id}`);
-  };
 
   const handleAddTaskClick = () => {
     setShowModal(true);
@@ -45,62 +39,55 @@ export default function TasksPage() {
           </button>
         </div>
 
-          <div className="flex items-center space-x-4 mb-8">
-            <button
-              className={`px-4 py-2 text-sm font-medium rounded-lg ${
-                filter === "all"
-                  ? "bg-blue-500 text-white"
-                  : "bg-gray-200 text-gray-700 hover:bg-gray-300"
-              }`}
-              onClick={() => handleFilterChange("all")}
-            >
-              All ({totalTasks})
-            </button>
-            <button
-              className={`px-4 py-2 text-sm font-medium rounded-lg ${
-                filter === "pending"
-                  ? "bg-blue-500 text-white"
-                  : "bg-gray-200 text-gray-700 hover:bg-gray-300"
-              }`}
-              onClick={() => handleFilterChange("pending")}
-            >
-              To Do ({pendingTasks})
-            </button>
-            <button
-              className={`px-4 py-2 text-sm font-medium rounded-lg ${
-                filter === "completed"
-                  ? "bg-blue-500 text-white"
-                  : "bg-gray-200 text-gray-700 hover:bg-gray-300"
-              }`}
-              onClick={() => handleFilterChange("completed")}
-            >
-              Done ({completedTasks})
-            </button>
-          </div>
+        <div className="flex items-center space-x-4 mb-8">
+          <button
+            className={`px-4 py-2 text-sm font-medium rounded-lg ${
+              filter === "all"
+                ? "bg-blue-500 text-white"
+                : "bg-gray-200 text-gray-700 hover:bg-gray-300"
+            }`}
+            onClick={() => handleFilterChange("all")}
+          >
+            All ({totalTasks})
+          </button>
+          <button
+            className={`px-4 py-2 text-sm font-medium rounded-lg ${
+              filter === "pending"
+                ? "bg-blue-500 text-white"
+                : "bg-gray-200 text-gray-700 hover:bg-gray-300"
+            }`}
+            onClick={() => handleFilterChange("pending")}
+          >
+            To Do ({pendingTasks})
+          </button>
+          <button
+            className={`px-4 py-2 text-sm font-medium rounded-lg ${
+              filter === "completed"
+                ? "bg-blue-500 text-white"
+                : "bg-gray-200 text-gray-700 hover:bg-gray-300"
+            }`}
+            onClick={() => handleFilterChange("completed")}
+          >
+            Done ({completedTasks})
+          </button>
+        </div>
 
         <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
           {(filter === "all" || filter === "pending") && (
             <div className="bg-[#f0f4ff] p-4 rounded-lg shadow">
-              <h2 className="text-lg font-bold text-[#8892b3] mb-4">
-                To Do
-              </h2>
+              <h2 className="text-lg font-bold text-[#8892b3] mb-4">To Do</h2>
               <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                 {tasks
                   ?.filter((task) => !task.completed)
                   .map((task) => (
-                    <div
+                    <Card
                       key={task._id}
-                      className="cursor-pointer"
-                      onClick={() => handleCardClick(task._id)}
-                    >
-                      <Card
-                        _id={task._id}
-                        title={task.title}
-                        description={task.description || ""}
-                        completed={task.completed}
-                        createdAt={task.createdAt}
-                      />
-                    </div>
+                      _id={task._id}
+                      title={task.title}
+                      description={task.description || ""}
+                      completed={task.completed}
+                      createdAt={task.createdAt}
+                    />
                   ))}
               </div>
             </div>
@@ -108,26 +95,19 @@ export default function TasksPage() {
 
           {(filter === "all" || filter === "completed") && (
             <div className="bg-[#f7f3ff] p-4 rounded-lg shadow">
-              <h2 className="text-lg font-bold text-[#988dae] mb-4">
-                Done
-              </h2>
+              <h2 className="text-lg font-bold text-[#988dae] mb-4">Done</h2>
               <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                 {tasks
                   ?.filter((task) => task.completed)
                   .map((task) => (
-                    <div
+                    <Card
                       key={task._id}
-                      className="cursor-pointer"
-                      onClick={() => handleCardClick(task._id)}
-                    >
-                      <Card
-                        _id={task._id}
-                        title={task.title}
-                        description={task.description || ""}
-                        completed={task.completed}
-                        createdAt={task.createdAt}
-                      />
-                    </div>
+                      _id={task._id}
+                      title={task.title}
+                      description={task.description || ""}
+                      completed={task.completed}
+                      createdAt={task.createdAt}
+                    />
                   ))}
               </div>
             </div>
