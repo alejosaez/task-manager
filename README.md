@@ -15,7 +15,7 @@ Este proyecto es el frontend de la aplicación **Task Manager**, desarrollado ut
 
 El frontend de la aplicación está desplegado en [Vercel](https://vercel.com) y es accesible en la siguiente URL:
 
-[**Task Manager - Frontend Deploy**](https://task-manager-h5ngfb4yn-alejosaezs-projects.vercel.app/tasks)
+[**Task Manager - Frontend Deploy**](https://task-manager-cmvbk5ns3-alejosaezs-projects.vercel.app/tasks)
 
 La aplicación es completamente funcional y accesible desde cualquier navegador moderno.
 
@@ -38,6 +38,52 @@ Todas estas peticiones son manejadas dinámicamente a través de **RTK Query** e
 ## **Responsividad**
 
 El proyecto está diseñado para ser **100% responsive**, lo que asegura que la aplicación se adapte de manera óptima a cualquier dispositivo, ya sea escritorio, tablet o móvil. Esto se logró mediante el uso de **Tailwind CSS** y prácticas modernas de diseño responsivo.
+
+---
+
+## **Características Implementadas**
+
+### **1. Confirmación de Eliminación**
+- Se utiliza un componente de popup para confirmar antes de eliminar una tarea.
+- Incluye un botón de **“Cancelar”** y **“Confirmar”**.
+- Uso de `e.stopPropagation()` para evitar redireccionar al detalle al interactuar con el modal.
+
+
+### **2. Notificaciones (Toastify)**
+- Se integraron notificaciones con **react-toastify** para los siguientes eventos:
+  - **Creación exitosa**: Aparece un mensaje verde al agregar una tarea.
+  - **Actualización exitosa**: Aparece un mensaje verde al actualizar una tarea.
+  - **Eliminación exitosa**: Aparece un mensaje rojo al eliminar una tarea.
+  - **Marcado como completado**: Notifica el cambio de estado con éxito.
+
+
+### **3. Spinner de Carga**
+- Se muestra un **spinner** en botones mientras se procesan operaciones de red (guardar o eliminar).
+- La tarjeta se desactiva visualmente (con opacidad) durante la eliminación para evitar interacciones.
+
+
+### **4. Filtrado de Tareas**
+- Opciones para filtrar entre todas, pendientes y completadas.
+- Interacción dinámica con los botones de filtro para mostrar las tareas correspondientes.
+
+
+### **5. Redux Toolkit**
+- Uso de **Redux Toolkit** para manejar el estado global y **RTK Query** para consumir las APIs.
+- Configuración del **Provider** en el layout global para que toda la aplicación tenga acceso al estado.
+
+## **Provider de Redux**
+
+ Cree un componente llamado `ReduxProvider` para configurar y proporcionar la store de Redux a toda la aplicación. Esto asegura que cualquier componente en la jerarquía pueda acceder al estado global gestionado por **Redux Toolkit** y **RTK Query**.
+
+El `ReduxProvider` se implementó en el layout principal del proyecto, garantizando que toda la aplicación pueda acceder de manera consistente al estado global.
+
+---
+
+## **Inspiración del Diseño**
+
+La inspiración del diseño se obtuvo de **Pinterest**. Esto permitió crear una interfaz **limpia y moderna**, enfocada en la usabilidad y la experiencia del usuario.
+
+Puedes ver el diseño de referencia en el siguiente enlace: [**Pinterest Design Inspiration**](https://dribbble.com/shots/17246001-Task-Tracker-Web-App)
 
 ---
 
